@@ -1,0 +1,5 @@
+name: 'My Devel'
+type: module
+description: 'Provides development tools.'
+package: Development
+core: 8.x
