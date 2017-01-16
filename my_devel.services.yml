@@ -1,0 +1,4 @@
+services:
+  my_devel.cache_helper:
+    class: Drupal\my_devel\CacheHelper
+    arguments: ['@http_client']
