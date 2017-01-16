@@ -4,3 +4,85 @@
  * @file
  * Provides development tools.
  */
+
+use Drupal\user\Entity\User;
+
+/**
+ * Creates a test user for each custom role.
+ */
+function my_devel_test_users_create() {
+  $logger = \Drupal::logger('my_devel');
+  foreach (_my_devel_get_custom_role_names() as $name) {
+    $user_exists = (bool) \Drupal::entityQuery('user')
+      ->condition('name', $name)
+      ->execute();
+    if ($user_exists) {
+      $logger->notice('User @name already exists.', [
+        '@name' => $name,
+      ]);
+    }
+    else {
+      $values = [
+        'name' => $name,
+        'mail' => "{$name}@example.com",
+        'roles' => [$name],
+        'status' => 1,
+      ];
+      User::create($values)
+        ->setPassword($name)
+        ->enforceIsNew()
+        ->save();
+      $logger->notice('Created user @name.', ['@name' => $name]);
+    }
+  }
+}
+
+/**
+ * Deletes the test users created by my_devel_create_test_users().
+ */
+function my_devel_test_users_delete() {
+  $logger = \Drupal::logger('my_devel');
+  foreach (_my_devel_get_custom_role_names() as $name) {
+    $id = reset(\Drupal::entityQuery('user')
+      ->condition('name', $name)
+      ->execute());
+    if ($id) {
+      User::load($id)->delete();
+      $logger->notice('Deleted user @name.', ['@name' => $name]);
+    }
+    else {
+      $logger->notice('No such user @name.', ['@name' => $name]);
+    }
+  }
+}
+
+/**
+ * Gets a list of test user names in the site.
+ *
+ * @return string[]
+ *   An array of test user account names.
+ */
+function my_devel_test_users_get_names() {
+  $user_ids = \Drupal::entityQuery('user')
+    ->condition('name', _my_devel_get_custom_role_names(), 'IN')
+    ->execute();
+  /** @var \Drupal\user\UserInterface[] $users */
+  $users = User::loadMultiple($user_ids);
+  $usernames = [];
+  foreach ($users as $user) {
+    $usernames[] = $user->getAccountName();
+  }
+  return $usernames;
+}
+
+/**
+ * Gets a list of custom role names in the site.
+ *
+ * @return string[]
+ *   An array of role names.
+ */
+function _my_devel_get_custom_role_names() {
+  return \Drupal::entityQuery('user_role')
+    ->condition('id', ['anonymous', 'authenticated'], 'NOT IN')
+    ->execute();
+}
