@@ -1,0 +1,12 @@
+{
+    "name": "traviscarden/my_devel",
+    "description": "Provides development tools.",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "TravisCarden",
+            "email": "travis.carden@gmail.com"
+        }
+    ]
+}
