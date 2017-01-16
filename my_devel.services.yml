@@ -2,3 +2,6 @@ services:
   my_devel.cache_helper:
     class: Drupal\my_devel\CacheHelper
     arguments: ['@http_client']
+  my_devel.config_helper:
+    class: Drupal\my_devel\ConfigHelper
+    arguments: ['@config.installer', '@config_update.config_update']

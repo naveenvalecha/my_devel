@@ -2,6 +2,9 @@
     "name": "traviscarden/my_devel",
     "description": "Provides development tools.",
     "type": "drupal-module",
+    "require": {
+        "drupal/config_update": "^1.1"
+    },
     "license": "GPL-2.0+",
     "authors": [
         {
