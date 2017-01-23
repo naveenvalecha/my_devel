@@ -40,18 +40,45 @@ class MyDevelFeatureSubContext extends DrupalSubContextBase implements DrupalSub
   }
 
   /**
+   * Asserts that a given role exists.
+   *
+   * @Then the :role_id role should exist
+   */
+  public function assertRoleExists($role_id) {
+    if (!Role::load($role_id)) {
+      throw new \Exception(sprintf('No such role: %s.', $role_id));
+    }
+  }
+
+  /**
+   * Asserts that a given role has exactly the given permissions (and no more).
+   *
+   * @Then the :role_id role should have exactly the following permissions
+   */
+  public function assertRoleHasExactPermissions($role_id, TableNode $expected) {
+    $this->assertRoleExists($role_id);
+
+    $permissions = [];
+    /** @var \Drupal\user\RoleInterface $role */
+    $role = Role::load($role_id);
+    foreach ($role->getPermissions() as $permission) {
+      $permissions[] = [$permission];
+    }
+    $actual = new TableNode($permissions);
+
+    $this->assertTableEquals($expected, $actual, 'Missing permissions', 'Unexpected permissions');
+  }
+
+  /**
    * Asserts that a given role is the administrator role.
    *
    * @Then the :role_id role should be the administrator role
    */
   public function assertRoleIsAdministrator($role_id) {
+    $this->assertRoleExists($role_id);
+
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::load($role_id);
-
-    if (!$role) {
-      throw new \Exception(sprintf('No such role: %s.', $role_id));
-    }
-
     if (!$role->isAdmin()) {
       throw new \Exception(sprintf('The %s role is not the administrator role.', $role_id));
     }
