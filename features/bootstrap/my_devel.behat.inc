@@ -58,13 +58,9 @@ class MyDevelFeatureSubContext extends DrupalSubContextBase implements DrupalSub
   public function assertRoleHasExactPermissions($role_id, TableNode $expected) {
     $this->assertRoleExists($role_id);
 
-    $permissions = [];
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::load($role_id);
-    foreach ($role->getPermissions() as $permission) {
-      $permissions[] = [$permission];
-    }
-    $actual = new TableNode($permissions);
+    $actual = $this->getTableFromList($role->getPermissions());
 
     $this->assertTableEquals($expected, $actual, 'Missing permissions', 'Unexpected permissions');
   }

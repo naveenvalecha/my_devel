@@ -143,6 +143,71 @@ class TableComparisonTraitTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * Tests getTableFromList().
+   */
+  public function testGetTableFromList() {
+    $list = [1, 2, 3];
+    $expected = new TableNode([[1], [2], [3]]);
+
+    $actual = $this->sut->getTableFromList($list);
+
+    $this->assertEquals($expected, $actual);
+  }
+
+  /**
+   * Tests getTableFromList() with a non-array argument.
+   *
+   * @dataProvider providerNonArrayArguments
+   * @expectedException \PHPUnit_Framework_Error
+   */
+  public function testGetTableFromListWithNonArrayArgument($argument) {
+    $this->sut->getTableFromList($argument);
+  }
+
+  /**
+   * Tests getTableFromList() with a multidimensional array argument.
+   *
+   * @expectedException \AssertionError
+   * @expectedExceptionMessage List must be a one-dimensional array.
+   */
+  public function testGetTableFromListWithMultidimensionalArrayArgument() {
+    $this->sut->getTableFromList([[1, 2, 3], [4, 5, 6]]);
+  }
+
+  /**
+   * Tests isArrayMultidimensional().
+   *
+   * @dataProvider providerTestIsArrayMultidimensional
+   */
+  public function testIsArrayMultidimensional($expected, $array) {
+    $actual = $this->sut->isArrayMultidimensional($array);
+
+    $this->assertSame($expected, $actual);
+  }
+
+  /**
+   * Data provider.
+   */
+  public function providerTestIsArrayMultidimensional() {
+    return [
+      [FALSE, [1]],
+      [FALSE, [1, 2, 3]],
+      [TRUE, [[1, 2]]],
+      [TRUE, [[1, 2], [3, 4]]],
+    ];
+  }
+
+  /**
+   * Tests getTableFromList() with a non-array argument.
+   *
+   * @dataProvider providerNonArrayArguments
+   * @expectedException \PHPUnit_Framework_Error
+   */
+  public function testIsArrayMultidimensionalWithNonArrayArgument($argument) {
+    $this->sut->isArrayMultidimensional($argument);
+  }
+
+  /**
    * Tests sortTable().
    *
    * @dataProvider providerTestSortTable
@@ -168,6 +233,19 @@ class TableComparisonTraitTest extends \PHPUnit_Framework_TestCase {
         self::TABLE_REALISTIC_UNSORTED,
         self::TABLE_REALISTIC_SORTED,
       ],
+    ];
+  }
+
+  /**
+   * Reusable data provider for non-array arguments.
+   */
+  public function providerNonArrayArguments() {
+    return [
+      ['string'],
+      [12345],
+      [123.45],
+      [TRUE],
+      [NULL],
     ];
   }
 
